@@ -46,7 +46,7 @@ This repository contains a variety of scripts and registry tweaks designed to ma
 One of the most popular tweaks allows you to add a "Take Ownership" option to your right-click context menu. This lets you quickly gain full control over any file or folder on your system – perfect for dealing with permission issues.
 
 ```batch
-# Simply run the appropriate script, and the option will appear in your context menu!
+REM Simply run the appropriate script, and the option will appear in your context menu!
 ```
 
 ## 🤝 Contributing
