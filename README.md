@@ -40,7 +40,10 @@ This repository contains a variety of useful tweaks and scripts, including but n
 1. Browse the repository to find the tweaks you're interested in
 2. Read the documentation for each script to understand what it does
 3. Create a system restore point (recommended)
-4. Right-click the script and select "Run as Administrator" (if required)
+4. Run the script:
+   - Right-click the script and select "Run as Administrator" (if admin rights required)
+   - Or double-click the script for standard execution
+   - Or run from Command Prompt/PowerShell
 5. Follow any on-screen instructions
 
 ## 🤝 Contributing
