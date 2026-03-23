@@ -24,10 +24,23 @@ function Log($msg) {
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 Title="Cleaner Pro"
 Height="720" Width="900"
-Background="#0B1220"
+Background="White"
 WindowStartupLocation="CenterScreen">
 
 <Grid Margin="15">
+
+<Grid.Resources>
+<Style TargetType="CheckBox">
+<Setter Property="Foreground" Value="#111827"/>
+<Setter Property="Margin" Value="0,2,0,2"/>
+</Style>
+
+<Style TargetType="ListBox">
+<Setter Property="Background" Value="White"/>
+<Setter Property="Foreground" Value="#111827"/>
+<Setter Property="BorderBrush" Value="#D1D5DB"/>
+</Style>
+</Grid.Resources>
 
 <Grid.RowDefinitions>
 <RowDefinition Height="Auto"/>
@@ -39,7 +52,7 @@ WindowStartupLocation="CenterScreen">
 <TextBlock Text="Cleaner Pro"
 FontSize="26"
 FontWeight="Bold"
-Foreground="White"
+Foreground="#111827"
 Margin="0,0,0,10"/>
 
 <!-- MAIN CONTENT -->
@@ -47,7 +60,7 @@ Margin="0,0,0,10"/>
 <WrapPanel>
 
 <!-- CLEANUP CARD -->
-<Border Background="#111827" CornerRadius="12" Padding="15" Margin="10" Width="260">
+<Border Background="#F8FAFC" BorderBrush="#D1D5DB" BorderThickness="1" CornerRadius="12" Padding="15" Margin="10" Width="260">
 <StackPanel>
 <TextBlock Text="Cleanup" Foreground="#60A5FA" FontSize="18" Margin="0,0,0,10"/>
 
@@ -65,7 +78,7 @@ Margin="0,0,0,10"/>
 </Border>
 
 <!-- PERFORMANCE CARD -->
-<Border Background="#111827" CornerRadius="12" Padding="15" Margin="10" Width="260">
+<Border Background="#F8FAFC" BorderBrush="#D1D5DB" BorderThickness="1" CornerRadius="12" Padding="15" Margin="10" Width="260">
 <StackPanel>
 <TextBlock Text="Performance" Foreground="#34D399" FontSize="18" Margin="0,0,0,10"/>
 
@@ -77,7 +90,7 @@ Margin="0,0,0,10"/>
 </Border>
 
 <!-- USERS CARD -->
-<Border Background="#111827" CornerRadius="12" Padding="15" Margin="10" Width="260">
+<Border Background="#F8FAFC" BorderBrush="#D1D5DB" BorderThickness="1" CornerRadius="12" Padding="15" Margin="10" Width="260">
 <StackPanel>
 <TextBlock Text="User Profiles" Foreground="#FBBF24" FontSize="18" Margin="0,0,0,10"/>
 
@@ -92,8 +105,9 @@ Margin="0,0,0,10"/>
 <!-- LOG OUTPUT -->
 <TextBox Name="OutputBox"
 Grid.Row="2"
-Background="#020617"
-Foreground="#22C55E"
+Background="White"
+Foreground="#111827"
+BorderBrush="#D1D5DB"
 AcceptsReturn="True"
 VerticalScrollBarVisibility="Auto"/>
 
