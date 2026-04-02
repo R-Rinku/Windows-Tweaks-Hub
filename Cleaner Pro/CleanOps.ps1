@@ -1,7 +1,11 @@
 $scriptPath = $MyInvocation.MyCommand.Path
 if ([string]::IsNullOrWhiteSpace($scriptPath)) {
-    Write-Error "Unable to resolve script path. Run this as a .ps1 file, not pasted commands."
-    exit 1
+    # Running via irm | iex — download and re-execute as a temp file
+    $tempFile = Join-Path $env:TEMP "CleanOps_Run.ps1"
+    $scriptUrl = "https://raw.githubusercontent.com/R-Rinku/Windows-Tweaks-Hub/refs/heads/main/Cleaner%20Pro/CleanOps.ps1"
+    Invoke-RestMethod -Uri $scriptUrl -OutFile $tempFile
+    Start-Process powershell.exe -ArgumentList "-NoProfile -STA -ExecutionPolicy Bypass -File `"$tempFile`"" -Verb RunAs
+    exit
 }
 
 if (-not ([Security.Principal.WindowsPrincipal]`
