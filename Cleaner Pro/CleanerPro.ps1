@@ -162,8 +162,16 @@ function Invoke-CleanAction {
                             <ListBox Name="UserList" Height="300" SelectionMode="Extended"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,10,0,0">
                                 <Button Name="DeleteUserBtn" Content="Delete" Background="#DC2626" Foreground="White" Width="80" Margin="0,0,10,0"/>
-                                <Button Name="RenameUserBtn" Content="Rename" Background="#F59E42" Foreground="White" Width="80"/>
+                                <Button Name="RenameUserBtn" Content="Rename" Background="#F59E42" Foreground="White" Width="80" IsEnabled="False"/>
                             </StackPanel>
+                        # Enable/disable Rename button based on selection
+                        $UserList.Add_SelectionChanged({
+                            if ($UserList.SelectedItems.Count -eq 1) {
+                                $RenameUserBtn.IsEnabled = $true
+                            } else {
+                                $RenameUserBtn.IsEnabled = $false
+                            }
+                        })
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -290,22 +298,22 @@ $DeleteUserBtn.Add_Click({
 })
 
 $RenameUserBtn.Add_Click({
-    if ($UserList.SelectedItems.Count -ne 1) {
-        [System.Windows.MessageBox]::Show("Please select a single user to rename.", "Select One User", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information) | Out-Null
-        return
-    }
     $oldName = $UserList.SelectedItem
+    # Popup for new name
     $inputBox = New-Object System.Windows.Window
     $inputBox.Title = "Rename User Profile"
     $inputBox.Width = 350
-    $inputBox.Height = 150
+    $inputBox.Height = 160
     $inputBox.WindowStartupLocation = 'CenterScreen'
     $inputBox.ResizeMode = 'NoResize'
     $panel = New-Object System.Windows.Controls.StackPanel
     $panel.Margin = '16'
     $label = New-Object System.Windows.Controls.TextBlock
-    $label.Text = "Enter new name for user '$oldName':"
+    $label.Text = "Enter new name for user profile:"
     $label.Margin = '0,0,0,8'
+    $oldLabel = New-Object System.Windows.Controls.TextBlock
+    $oldLabel.Text = "Old name: $oldName"
+    $oldLabel.Margin = '0,0,0,8'
     $textBox = New-Object System.Windows.Controls.TextBox
     $textBox.Text = $oldName
     $textBox.Margin = '0,0,0,8'
@@ -321,6 +329,7 @@ $RenameUserBtn.Add_Click({
     $btnPanel.Children.Add($okBtn) | Out-Null
     $btnPanel.Children.Add($cancelBtn) | Out-Null
     $panel.Children.Add($label) | Out-Null
+    $panel.Children.Add($oldLabel) | Out-Null
     $panel.Children.Add($textBox) | Out-Null
     $panel.Children.Add($btnPanel) | Out-Null
     $inputBox.Content = $panel
