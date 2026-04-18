@@ -203,22 +203,78 @@ function Load-UserProfiles {
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Registry Paths">
-                <Grid Margin="14">
-                    <StackPanel>
-                        <TextBlock Text="User Profiles Registry Path" FontSize="20" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,10"/>
-                        <TextBox Name="RegPathBox"
-                                 Text="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList"
-                                 IsReadOnly="True"
-                                 FontFamily="Consolas"
-                                 FontSize="13"
-                                 Background="White"
-                                 Foreground="#0F172A"
-                                 BorderBrush="#94A3B8"
-                                 BorderThickness="1"
-                                 Padding="10"/>
-                        <Button Name="CopyRegPathBtn" Content="Copy to Clipboard" Background="#0EA5E9" Foreground="White" Margin="0,10,0,0" Padding="12,8"/>
-                    </StackPanel>
+            <TabItem Header="Tweeks &amp; Settings">
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="0,0,10,0">
+                        <StackPanel>
+                            <Border Background="#F8FAFC" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="12" Padding="12" Margin="0,0,0,10">
+                                <StackPanel>
+                                    <TextBlock Text="Features" FontSize="18" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,8"/>
+                                    <CheckBox Name="DotNetFeatureCB" Content="All .Net Framework (2,3,4) (?)" ToolTip="Installs .NET optional framework components (restart may be required)."/>
+                                    <CheckBox Name="DisableLegacyF8CB" Content="Disable Legacy F8 Boot Recovery (?)" ToolTip="Sets boot menu policy to standard."
+                                              Foreground="#7F1D1D"/>
+                                    <CheckBox Name="EnableRegBackupTaskCB" Content="Enable Daily Registry Backup Task 12.30am (?)" ToolTip="Creates a daily scheduled task for registry export backup."/>
+                                    <CheckBox Name="EnableLegacyF8CB" Content="Enable Legacy F8 Boot Recovery (?)" ToolTip="Sets boot menu policy to legacy."
+                                              Foreground="#7F1D1D"/>
+                                    <CheckBox Name="HyperVCB" Content="HyperV Virtualization (?)" ToolTip="Installs Hyper-V related optional features (restart may be required)."/>
+                                    <CheckBox Name="LegacyMediaCB" Content="Legacy Media (WMP, DirectPlay) (?)" ToolTip="Installs classic media components and DirectPlay."/>
+                                    <CheckBox Name="NfsCB" Content="NFS - Network File System (?)" ToolTip="Installs NFS client components."/>
+                                    <CheckBox Name="SandboxCB" Content="Windows Sandbox (?)" ToolTip="Installs Windows Sandbox optional feature."/>
+                                    <CheckBox Name="WslCB" Content="Windows Subsystem for Linux (?)" ToolTip="Installs WSL and VirtualMachinePlatform features."/>
+                                    <Button Name="InstallFeaturesBtn" Content="Install Features" Background="#334155" Foreground="White" Margin="0,8,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#F8FAFC" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="12" Padding="12">
+                                <StackPanel>
+                                    <TextBlock Text="Fixes" FontSize="18" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,8"/>
+                                    <Button Name="ResetNetworkBtn" Content="Reset Network" Background="#475569" Foreground="White"/>
+                                    <Button Name="SystemCorruptionScanBtn" Content="System Corruption Scan" Background="#475569" Foreground="White"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <Border Background="#F8FAFC" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="12" Padding="12" Margin="0,0,0,10">
+                                <StackPanel>
+                                    <TextBlock Text="Legacy Windows Panels" FontSize="18" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,8"/>
+                                    <Button Name="ComputerManagementBtn" Content="Computer Management" Background="#E2E8F0" Foreground="#1E293B"/>
+                                    <Button Name="ControlPanelBtn" Content="Control Panel" Background="#E2E8F0" Foreground="#1E293B"/>
+                                    <Button Name="NetworkConnectionsBtn" Content="Network Connections" Background="#E2E8F0" Foreground="#1E293B"/>
+                                    <Button Name="PowerPanelBtn" Content="Power Panel" Background="#E2E8F0" Foreground="#1E293B"/>
+                                    <Button Name="PrinterPanelBtn" Content="Printer Panel" Background="#E2E8F0" Foreground="#1E293B"/>
+                                    <Button Name="RegionBtn" Content="Region" Background="#E2E8F0" Foreground="#1E293B"/>
+                                    <Button Name="SoundSettingsBtn" Content="Sound Settings" Background="#E2E8F0" Foreground="#1E293B"/>
+                                    <Button Name="SystemPropertiesBtn" Content="System Properties" Background="#E2E8F0" Foreground="#1E293B"/>
+                                    <Button Name="TimeAndDateBtn" Content="Time and Date" Background="#E2E8F0" Foreground="#1E293B"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#F8FAFC" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="12" Padding="12">
+                                <StackPanel>
+                                    <TextBlock Text="User Profiles Registry Path" FontSize="18" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,8"/>
+                                    <TextBox Name="RegPathBox"
+                                             Text="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList"
+                                             IsReadOnly="True"
+                                             FontFamily="Consolas"
+                                             FontSize="13"
+                                             Background="White"
+                                             Foreground="#0F172A"
+                                             BorderBrush="#94A3B8"
+                                             BorderThickness="1"
+                                             Padding="10"/>
+                                    <Button Name="CopyRegPathBtn" Content="Copy to Clipboard" Background="#0EA5E9" Foreground="White" Margin="0,10,0,0" Padding="12,8"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
                 </Grid>
             </TabItem>
 
@@ -229,8 +285,8 @@ function Load-UserProfiles {
                         <TextBlock Text="Advanced Cleanup &amp; Optimization Tool" FontSize="14" Foreground="#475569" Margin="0,0,0,20"/>
 
                         <TextBlock Text="Credits" FontSize="18" FontWeight="Bold" Foreground="#0C4A6E" Margin="0,0,0,10"/>
-                        <TextBlock Text="Original Concept &amp; DNS Tools: DNS Labs" FontSize="13" Foreground="#334155" Margin="0,0,0,5"/>
-                        <TextBlock Text="Enhanced Version &amp; UI Development: Your Name" FontSize="13" Foreground="#334155" Margin="0,0,0,20"/>
+                        <TextBlock Text="Original Concept: DNS Labs" FontSize="13" Foreground="#334155" Margin="0,0,0,5"/>
+                        <TextBlock Text="Enhanced Version &amp; UI Development: Ri" FontSize="13" Foreground="#334155" Margin="0,0,0,20"/>
 
                         <TextBlock Text="Features" FontSize="18" FontWeight="Bold" Foreground="#0C4A6E" Margin="0,0,0,10"/>
                         <TextBlock Text="✓ VDI &amp; Laptop Presets" TextWrapping="Wrap" FontSize="12" Foreground="#334155" Margin="0,0,0,5"/>
@@ -293,6 +349,30 @@ $DeleteUserBtn = $window.FindName("DeleteUserBtn")
 $RegPathBox = $window.FindName("RegPathBox")
 $CopyRegPathBtn = $window.FindName("CopyRegPathBtn")
 
+$DotNetFeatureCB = $window.FindName("DotNetFeatureCB")
+$DisableLegacyF8CB = $window.FindName("DisableLegacyF8CB")
+$EnableRegBackupTaskCB = $window.FindName("EnableRegBackupTaskCB")
+$EnableLegacyF8CB = $window.FindName("EnableLegacyF8CB")
+$HyperVCB = $window.FindName("HyperVCB")
+$LegacyMediaCB = $window.FindName("LegacyMediaCB")
+$NfsCB = $window.FindName("NfsCB")
+$SandboxCB = $window.FindName("SandboxCB")
+$WslCB = $window.FindName("WslCB")
+
+$InstallFeaturesBtn = $window.FindName("InstallFeaturesBtn")
+$ResetNetworkBtn = $window.FindName("ResetNetworkBtn")
+$SystemCorruptionScanBtn = $window.FindName("SystemCorruptionScanBtn")
+
+$ComputerManagementBtn = $window.FindName("ComputerManagementBtn")
+$ControlPanelBtn = $window.FindName("ControlPanelBtn")
+$NetworkConnectionsBtn = $window.FindName("NetworkConnectionsBtn")
+$PowerPanelBtn = $window.FindName("PowerPanelBtn")
+$PrinterPanelBtn = $window.FindName("PrinterPanelBtn")
+$RegionBtn = $window.FindName("RegionBtn")
+$SoundSettingsBtn = $window.FindName("SoundSettingsBtn")
+$SystemPropertiesBtn = $window.FindName("SystemPropertiesBtn")
+$TimeAndDateBtn = $window.FindName("TimeAndDateBtn")
+
 $TempCB = $window.FindName("TempCB")
 $WinTempCB = $window.FindName("WinTempCB")
 $RecycleCB = $window.FindName("RecycleCB")
@@ -351,6 +431,30 @@ $DeleteUserBtn = Ensure-Control -Control $DeleteUserBtn -ControlType ([System.Wi
 
 $RegPathBox = Ensure-Control -Control $RegPathBox -ControlType ([System.Windows.Controls.TextBox])
 $CopyRegPathBtn = Ensure-Control -Control $CopyRegPathBtn -ControlType ([System.Windows.Controls.Button])
+
+$DotNetFeatureCB = Ensure-Control -Control $DotNetFeatureCB -ControlType ([System.Windows.Controls.CheckBox])
+$DisableLegacyF8CB = Ensure-Control -Control $DisableLegacyF8CB -ControlType ([System.Windows.Controls.CheckBox])
+$EnableRegBackupTaskCB = Ensure-Control -Control $EnableRegBackupTaskCB -ControlType ([System.Windows.Controls.CheckBox])
+$EnableLegacyF8CB = Ensure-Control -Control $EnableLegacyF8CB -ControlType ([System.Windows.Controls.CheckBox])
+$HyperVCB = Ensure-Control -Control $HyperVCB -ControlType ([System.Windows.Controls.CheckBox])
+$LegacyMediaCB = Ensure-Control -Control $LegacyMediaCB -ControlType ([System.Windows.Controls.CheckBox])
+$NfsCB = Ensure-Control -Control $NfsCB -ControlType ([System.Windows.Controls.CheckBox])
+$SandboxCB = Ensure-Control -Control $SandboxCB -ControlType ([System.Windows.Controls.CheckBox])
+$WslCB = Ensure-Control -Control $WslCB -ControlType ([System.Windows.Controls.CheckBox])
+
+$InstallFeaturesBtn = Ensure-Control -Control $InstallFeaturesBtn -ControlType ([System.Windows.Controls.Button])
+$ResetNetworkBtn = Ensure-Control -Control $ResetNetworkBtn -ControlType ([System.Windows.Controls.Button])
+$SystemCorruptionScanBtn = Ensure-Control -Control $SystemCorruptionScanBtn -ControlType ([System.Windows.Controls.Button])
+
+$ComputerManagementBtn = Ensure-Control -Control $ComputerManagementBtn -ControlType ([System.Windows.Controls.Button])
+$ControlPanelBtn = Ensure-Control -Control $ControlPanelBtn -ControlType ([System.Windows.Controls.Button])
+$NetworkConnectionsBtn = Ensure-Control -Control $NetworkConnectionsBtn -ControlType ([System.Windows.Controls.Button])
+$PowerPanelBtn = Ensure-Control -Control $PowerPanelBtn -ControlType ([System.Windows.Controls.Button])
+$PrinterPanelBtn = Ensure-Control -Control $PrinterPanelBtn -ControlType ([System.Windows.Controls.Button])
+$RegionBtn = Ensure-Control -Control $RegionBtn -ControlType ([System.Windows.Controls.Button])
+$SoundSettingsBtn = Ensure-Control -Control $SoundSettingsBtn -ControlType ([System.Windows.Controls.Button])
+$SystemPropertiesBtn = Ensure-Control -Control $SystemPropertiesBtn -ControlType ([System.Windows.Controls.Button])
+$TimeAndDateBtn = Ensure-Control -Control $TimeAndDateBtn -ControlType ([System.Windows.Controls.Button])
 
 $TempCB = Ensure-Control -Control $TempCB -ControlType ([System.Windows.Controls.CheckBox])
 $WinTempCB = Ensure-Control -Control $WinTempCB -ControlType ([System.Windows.Controls.CheckBox])
@@ -441,25 +545,190 @@ function Set-PresetState {
 function Set-EnterpriseMode {
     param([bool]$Enabled)
 
-    if ($Enabled) {
-        $PrefetchCB.IsChecked = $false
-        $SpoolerCB.IsChecked = $false
-        $ComponentCB.IsChecked = $false
-        $HiberCB.IsChecked = $false
+    $enterpriseRestrictedOptions = @(
+        $PrefetchCB, $SpoolerCB, $ComponentCB, $HiberCB,
+        $DisableLegacyF8CB, $EnableLegacyF8CB, $HyperVCB, $LegacyMediaCB,
+        $SandboxCB, $WslCB
+    )
 
-        $PrefetchCB.IsEnabled = $false
-        $SpoolerCB.IsEnabled = $false
-        $ComponentCB.IsEnabled = $false
-        $HiberCB.IsEnabled = $false
-        $RenameUserBtn.IsEnabled = $false
-        $DeleteUserBtn.IsEnabled = $false
+    $enterpriseRestrictedButtons = @(
+        $RenameUserBtn, $DeleteUserBtn
+    )
+
+    if ($Enabled) {
+        foreach ($control in $enterpriseRestrictedOptions) {
+            if ($null -ne $control) {
+                $control.IsChecked = $false
+                $control.IsEnabled = $false
+            }
+        }
+
+        foreach ($control in $enterpriseRestrictedButtons) {
+            if ($null -ne $control) {
+                $control.IsEnabled = $false
+            }
+        }
     } else {
-        $PrefetchCB.IsEnabled = $true
-        $SpoolerCB.IsEnabled = $true
-        $ComponentCB.IsEnabled = $true
-        $HiberCB.IsEnabled = $true
-        $RenameUserBtn.IsEnabled = $true
-        $DeleteUserBtn.IsEnabled = $true
+        foreach ($control in $enterpriseRestrictedOptions) {
+            if ($null -ne $control) {
+                $control.IsEnabled = $true
+            }
+        }
+
+        foreach ($control in $enterpriseRestrictedButtons) {
+            if ($null -ne $control) {
+                $control.IsEnabled = $true
+            }
+        }
+    }
+}
+
+function Add-OptionalFeatureNames {
+    param(
+        [System.Collections.Generic.List[string]]$Target,
+        [string[]]$Names
+    )
+
+    foreach ($name in $Names) {
+        if ([string]::IsNullOrWhiteSpace($name)) { continue }
+        if (-not $Target.Contains($name)) {
+            $Target.Add($name)
+        }
+    }
+}
+
+function Enable-OptionalFeatureSafe {
+    param(
+        [string]$FeatureName,
+        [System.Collections.Generic.List[string]]$Status
+    )
+
+    try {
+        $feature = Get-WindowsOptionalFeature -Online -FeatureName $FeatureName -ErrorAction Stop
+        if ($feature.State -eq "Enabled") {
+            $Status.Add("Already enabled: $FeatureName")
+            return $true
+        }
+
+        Enable-WindowsOptionalFeature -Online -FeatureName $FeatureName -All -NoRestart -ErrorAction Stop | Out-Null
+        $Status.Add("Installed: $FeatureName")
+        return $true
+    } catch {
+        $Status.Add("Skipped: $FeatureName ($($_.Exception.Message))")
+        return $false
+    }
+}
+
+function Install-SelectedFeatures {
+    $featuresToInstall = New-Object 'System.Collections.Generic.List[string]'
+
+    if ($DotNetFeatureCB.IsChecked) {
+        Add-OptionalFeatureNames -Target $featuresToInstall -Names @("NetFx3", "NetFx4-AdvSrvs")
+    }
+    if ($HyperVCB.IsChecked) {
+        Add-OptionalFeatureNames -Target $featuresToInstall -Names @("Microsoft-Hyper-V-All", "HypervisorPlatform")
+    }
+    if ($LegacyMediaCB.IsChecked) {
+        Add-OptionalFeatureNames -Target $featuresToInstall -Names @("WindowsMediaPlayer", "DirectPlay")
+    }
+    if ($NfsCB.IsChecked) {
+        Add-OptionalFeatureNames -Target $featuresToInstall -Names @("ServicesForNFS-ClientOnly", "ClientForNFS-Infrastructure")
+    }
+    if ($SandboxCB.IsChecked) {
+        Add-OptionalFeatureNames -Target $featuresToInstall -Names @("Containers-DisposableClientVM")
+    }
+    if ($WslCB.IsChecked) {
+        Add-OptionalFeatureNames -Target $featuresToInstall -Names @("Microsoft-Windows-Subsystem-Linux", "VirtualMachinePlatform")
+    }
+
+    $didWork = $false
+    $status = New-Object System.Collections.Generic.List[string]
+
+    foreach ($featureName in $featuresToInstall) {
+        if (Enable-OptionalFeatureSafe -FeatureName $featureName -Status $status) {
+            $didWork = $true
+        }
+    }
+
+    if ($DisableLegacyF8CB.IsChecked) {
+        try {
+            bcdedit /set "{default}" bootmenupolicy standard | Out-Null
+            $status.Add("Applied: Legacy F8 disabled")
+            $didWork = $true
+        } catch {
+            $status.Add("Failed: Disable Legacy F8 ($($_.Exception.Message))")
+        }
+    }
+
+    if ($EnableLegacyF8CB.IsChecked) {
+        try {
+            bcdedit /set "{default}" bootmenupolicy legacy | Out-Null
+            $status.Add("Applied: Legacy F8 enabled")
+            $didWork = $true
+        } catch {
+            $status.Add("Failed: Enable Legacy F8 ($($_.Exception.Message))")
+        }
+    }
+
+    if ($EnableRegBackupTaskCB.IsChecked) {
+        try {
+            $backupFolder = Join-Path $env:ProgramData "CleanerPro\RegistryBackups"
+            New-Item -Path $backupFolder -ItemType Directory -Force | Out-Null
+
+            $backupScriptPath = Join-Path $backupFolder "ExportRegistry.ps1"
+            $backupScript = @"
+`$dest = Join-Path "$backupFolder" ("RegistryBackup_" + (Get-Date -Format 'yyyyMMdd_HHmmss') + ".reg")
+reg export HKLM `$dest /y | Out-Null
+"@
+            Set-Content -Path $backupScriptPath -Value $backupScript -Encoding UTF8
+
+            $taskAction = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$backupScriptPath`""
+            schtasks /Create /F /TN "CleanerPro\DailyRegistryBackup" /SC DAILY /ST 00:30 /RL HIGHEST /TR $taskAction | Out-Null
+            $status.Add("Applied: Daily registry backup task created")
+            $didWork = $true
+        } catch {
+            $status.Add("Failed: Registry backup task ($($_.Exception.Message))")
+        }
+    }
+
+    if (-not $didWork) {
+        [System.Windows.MessageBox]::Show(
+            "No Tweeks & Settings feature option is selected.",
+            "Install Features",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Information
+        ) | Out-Null
+        return
+    }
+
+    $message = ($status -join [Environment]::NewLine) + [Environment]::NewLine + [Environment]::NewLine + "A restart may be required for some changes."
+    [System.Windows.MessageBox]::Show(
+        $message,
+        "Install Features",
+        [System.Windows.MessageBoxButton]::OK,
+        [System.Windows.MessageBoxImage]::Information
+    ) | Out-Null
+}
+
+function Invoke-OpenLegacyPanel {
+    param(
+        [string]$FilePath,
+        [string[]]$Arguments
+    )
+
+    try {
+        if ($Arguments -and $Arguments.Count -gt 0) {
+            Start-Process -FilePath $FilePath -ArgumentList $Arguments | Out-Null
+        } else {
+            Start-Process -FilePath $FilePath | Out-Null
+        }
+    } catch {
+        [System.Windows.MessageBox]::Show(
+            "Unable to open panel: $($_.Exception.Message)",
+            "Tweeks & Settings",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        ) | Out-Null
     }
 }
 
@@ -983,6 +1252,41 @@ $CopyRegPathBtn.Add_Click({
         [System.Windows.MessageBoxImage]::Information
     ) | Out-Null
 })
+
+$InstallFeaturesBtn.Add_Click({
+    Install-SelectedFeatures
+})
+
+$ResetNetworkBtn.Add_Click({
+    $cmd = @'
+Write-Host "Resetting network stack..." -ForegroundColor Cyan
+netsh winsock reset
+netsh int ip reset
+ipconfig /flushdns
+Write-Host "Network reset completed. Restart is recommended." -ForegroundColor Yellow
+'@
+    Start-Process -FilePath "powershell.exe" -ArgumentList "-NoProfile", "-NoExit", "-ExecutionPolicy", "Bypass", "-Command", $cmd | Out-Null
+})
+
+$SystemCorruptionScanBtn.Add_Click({
+    $cmd = @'
+Write-Host "Starting system corruption scan..." -ForegroundColor Cyan
+sfc /scannow
+DISM /Online /Cleanup-Image /RestoreHealth
+Write-Host "System corruption scan completed." -ForegroundColor Green
+'@
+    Start-Process -FilePath "powershell.exe" -ArgumentList "-NoProfile", "-NoExit", "-ExecutionPolicy", "Bypass", "-Command", $cmd | Out-Null
+})
+
+$ComputerManagementBtn.Add_Click({ Invoke-OpenLegacyPanel -FilePath "compmgmt.msc" })
+$ControlPanelBtn.Add_Click({ Invoke-OpenLegacyPanel -FilePath "control.exe" })
+$NetworkConnectionsBtn.Add_Click({ Invoke-OpenLegacyPanel -FilePath "ncpa.cpl" })
+$PowerPanelBtn.Add_Click({ Invoke-OpenLegacyPanel -FilePath "powercfg.cpl" })
+$PrinterPanelBtn.Add_Click({ Invoke-OpenLegacyPanel -FilePath "control.exe" -Arguments @("printers") })
+$RegionBtn.Add_Click({ Invoke-OpenLegacyPanel -FilePath "intl.cpl" })
+$SoundSettingsBtn.Add_Click({ Invoke-OpenLegacyPanel -FilePath "mmsys.cpl" })
+$SystemPropertiesBtn.Add_Click({ Invoke-OpenLegacyPanel -FilePath "sysdm.cpl" })
+$TimeAndDateBtn.Add_Click({ Invoke-OpenLegacyPanel -FilePath "timedate.cpl" })
 
 $PreviewBtn.Add_Click({
     $sizeBytes = Get-EstimatedSelectedSizeBytes
