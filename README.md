@@ -3,6 +3,12 @@
 A curated hub of **Windows scripts, tweaks, and hacks** focused on improving productivity, privacy, and system setup.
 
 <p align="left">
+  <a href="https://github.com/R-Rinku/Windows-Tweaks-Hub/blob/main/LICENSE">
+    <img alt="License" src="https://img.shields.io/github/license/R-Rinku/Windows-Tweaks-Hub?style=for-the-badge&color=yellow&labelColor=0d1117">
+  </a>
+  <a href="https://github.com/R-Rinku/Windows-Tweaks-Hub/commits/main">
+    <img alt="Last Commit" src="https://img.shields.io/github/last-commit/R-Rinku/Windows-Tweaks-Hub?style=for-the-badge&logo=github&color=orange&labelColor=0d1117">
+  </a>
   <a href="https://www.rinkurapria.dev/" target="_blank" rel="noopener">
     <img alt="Portfolio" src="https://img.shields.io/badge/Portfolio-rinkurapria.dev-0A66C2?style=for-the-badge">
   </a>
