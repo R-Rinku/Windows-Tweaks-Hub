@@ -29,4 +29,4 @@ All scripts and tweaks are provided **as-is**. You’re responsible for reviewin
 ---
 ### Links
 - Portfolio: https://www.rinkurapria.dev/
-- Blogs: https://www.rinkurapria.dev/blog/
+- Blogs: https://www.dnslabs.tech/
