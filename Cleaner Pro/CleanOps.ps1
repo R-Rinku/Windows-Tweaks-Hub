@@ -853,7 +853,7 @@ function Get-InstalledAppInventory {
     foreach ($root in $registryRoots) {
         Get-ItemProperty -Path $root.Path -ErrorAction SilentlyContinue |
             Where-Object {
-                $_.DisplayName -and (-not $_.SystemComponent) -and ($_.UninstallString -or $_.QuietUninstallString)
+                $_.DisplayName -and (-not $_.SystemComponent)
             } |
             ForEach-Object {
                 $displayName = [string]$_.DisplayName
@@ -944,7 +944,8 @@ function Invoke-BulkAppUninstall {
 
             $command = [string]$app.UninstallCommand
             if ([string]::IsNullOrWhiteSpace($command)) {
-                throw "No uninstall command found."
+                $results.Add("Skipped: $($app.DisplayName) (no uninstall command found)")
+                continue
             }
 
             if ($command -match 'msiexec(\.exe)?') {
