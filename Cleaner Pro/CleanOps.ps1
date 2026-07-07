@@ -843,6 +843,7 @@ function Split-CommandLine {
 function Get-InstalledAppInventory {
     $inventory = New-Object System.Collections.Generic.List[object]
     $dedupe = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+    $currentSid = [Security.Principal.WindowsIdentity]::GetCurrent().User.Value
 
     $registryRoots = @(
         @{ Path = 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*'; Scope = 'Machine' },
@@ -878,19 +879,48 @@ function Get-InstalledAppInventory {
     }
 
     try {
-        Get-AppxPackage -ErrorAction SilentlyContinue |
+        Get-AppxPackage -AllUsers -ErrorAction SilentlyContinue |
             Where-Object { $_.Name -and (-not $_.IsFramework) -and (-not $_.NonRemovable) } |
             ForEach-Object {
+                $scope = 'All Users'
+                foreach ($userInfo in @($_.PackageUserInformation)) {
+                    if ($userInfo.UserSecurityId -eq $currentSid) {
+                        $scope = 'Current User'
+                        break
+                    }
+                }
+
                 $dedupeKey = "Appx|$($_.PackageFullName)"
                 if ($dedupe.Add($dedupeKey)) {
                     $inventory.Add([pscustomobject]@{
                         DisplayName = $_.Name
-                        DisplayText = "$($_.Name)  [$($_.Version)]  -  Appx  ($($_.Publisher))"
+                        DisplayText = "$($_.Name)  [$($_.Version)]  -  Appx  ($scope)  ($($_.Publisher))"
                         Publisher = [string]$_.Publisher
                         Version = [string]$_.Version
-                        Scope = 'Current User'
+                        Scope = $scope
                         Type = 'Appx'
                         PackageFullName = [string]$_.PackageFullName
+                        UninstallCommand = $null
+                    })
+                }
+            }
+
+        Get-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue |
+            Where-Object { ($_.DisplayName -or $_.PackageName) -and (-not $_.NonRemovable) } |
+            ForEach-Object {
+                $packageName = [string]$_.PackageName
+                $displayName = if ([string]::IsNullOrWhiteSpace($_.DisplayName)) { $packageName } else { [string]$_.DisplayName }
+                $version = [string]$_.Version
+                $dedupeKey = "Provisioned|$packageName"
+                if ($dedupe.Add($dedupeKey)) {
+                    $inventory.Add([pscustomobject]@{
+                        DisplayName = $displayName
+                        DisplayText = if ($version) { "$displayName  [$version]  -  Provisioned Appx  (System)" } else { "$displayName  -  Provisioned Appx  (System)" }
+                        Publisher = [string]$_.PublisherId
+                        Version = $version
+                        Scope = 'System'
+                        Type = 'ProvisionedAppx'
+                        PackageFullName = $packageName
                         UninstallCommand = $null
                     })
                 }
@@ -936,9 +966,19 @@ function Invoke-BulkAppUninstall {
     $results = New-Object System.Collections.Generic.List[string]
     foreach ($app in $Applications) {
         try {
-            if ($app.Type -eq 'Appx') {
+            if ($app.Type -eq 'Appx' -and $app.Scope -eq 'Current User') {
                 Remove-AppxPackage -Package $app.PackageFullName -ErrorAction Stop
                 $results.Add("Removed Appx: $($app.DisplayName)")
+                continue
+            }
+
+            if ($app.Type -eq 'Appx') {
+                $results.Add("Skipped: $($app.DisplayName) (system-wide Appx entry)")
+                continue
+            }
+
+            if ($app.Type -eq 'ProvisionedAppx') {
+                $results.Add("Skipped: $($app.DisplayName) (provisioned system app)")
                 continue
             }
 
