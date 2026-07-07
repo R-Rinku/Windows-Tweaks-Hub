@@ -317,6 +317,47 @@ function Load-UserProfiles {
                 </Grid>
             </TabItem>
 
+            <TabItem Header="Installed Apps">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Background="#F8FAFC" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,0,0,10">
+                        <StackPanel>
+                            <TextBlock Text="Enterprise-friendly app inventory" Foreground="#0F172A" FontSize="18" FontWeight="Bold" Margin="0,0,0,6"/>
+                            <TextBlock TextWrapping="Wrap" Foreground="#475569" Margin="0,0,0,10"
+                                       Text="List installed desktop and appx packages, review them in bulk, and uninstall selected items from one place."/>
+                            <WrapPanel Margin="0,0,0,8">
+                                <Button Name="RefreshAppsBtn" Content="Refresh Apps" Background="#1E40AF" Foreground="White" Padding="12,8" Margin="0,0,8,0"/>
+                                <Button Name="SelectAllAppsBtn" Content="Select All" Background="#334155" Foreground="White" Padding="12,8" Margin="0,0,8,0"/>
+                                <Button Name="ClearAppsBtn" Content="Clear Selection" Background="#475569" Foreground="White" Padding="12,8" Margin="0,0,8,0"/>
+                                <Button Name="UninstallSelectedAppsBtn" Content="Uninstall Selected" Background="#B91C1C" Foreground="White" Padding="12,8"/>
+                            </WrapPanel>
+                            <DockPanel LastChildFill="False">
+                                <TextBlock Name="AppsStatusText" Text="Apps loaded: 0" Foreground="#334155" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <TextBlock Text="Use Ctrl or Shift to select multiple apps." Foreground="#64748B" VerticalAlignment="Center"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Row="1" Background="#F8FAFC" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="6" Padding="12">
+                        <StackPanel>
+                            <TextBlock Text="Installed applications" Foreground="#0F172A" FontSize="18" FontWeight="Bold" Margin="0,0,0,8"/>
+                            <ListBox Name="InstalledAppsList"
+                                     Height="420"
+                                     SelectionMode="Extended"
+                                     DisplayMemberPath="DisplayText"
+                                     Background="White"
+                                     BorderBrush="#94A3B8"
+                                     BorderThickness="1"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </TabItem>
+
             <TabItem Header="About">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10">
                     <Grid Margin="6">
@@ -625,6 +666,12 @@ $DisableGameBarCB    = Ensure-Control -Control $DisableGameBarCB    -ControlType
 $EnableHAGSCB        = Ensure-Control -Control $EnableHAGSCB        -ControlType ([System.Windows.Controls.CheckBox])
 $DisableNagleCB      = Ensure-Control -Control $DisableNagleCB      -ControlType ([System.Windows.Controls.CheckBox])
 $DisableMouseAccelCB = Ensure-Control -Control $DisableMouseAccelCB -ControlType ([System.Windows.Controls.CheckBox])
+$RefreshAppsBtn          = Ensure-Control -Control $RefreshAppsBtn          -ControlType ([System.Windows.Controls.Button])
+$SelectAllAppsBtn        = Ensure-Control -Control $SelectAllAppsBtn        -ControlType ([System.Windows.Controls.Button])
+$ClearAppsBtn            = Ensure-Control -Control $ClearAppsBtn            -ControlType ([System.Windows.Controls.Button])
+$UninstallSelectedAppsBtn = Ensure-Control -Control $UninstallSelectedAppsBtn -ControlType ([System.Windows.Controls.Button])
+$AppsStatusText          = Ensure-Control -Control $AppsStatusText          -ControlType ([System.Windows.Controls.TextBlock])
+$InstalledAppsList       = Ensure-Control -Control $InstalledAppsList       -ControlType ([System.Windows.Controls.ListBox])
 
 $allOptionControls = @(
     $TempCB, $WinTempCB, $RecycleCB, $UpdateCB, $DeliveryCB, $PrefetchCB,
@@ -774,6 +821,158 @@ function Invoke-OpenLegacyPanel {
     } catch {
         [System.Windows.MessageBox]::Show("Unable to open panel: $($_.Exception.Message)","Tweeks & Settings",[System.Windows.MessageBoxButton]::OK,[System.Windows.MessageBoxImage]::Error) | Out-Null
     }
+}
+
+function Split-CommandLine {
+    param([string]$CommandLine)
+    $result = [pscustomobject]@{ FilePath = $null; Arguments = $null }
+    if ([string]::IsNullOrWhiteSpace($CommandLine)) { return $result }
+
+    $trimmed = $CommandLine.Trim()
+    if ($trimmed -match '^"([^"]+)"\s*(.*)$') {
+        $result.FilePath = $matches[1]
+        $result.Arguments = $matches[2].Trim()
+    } elseif ($trimmed -match '^([^\s]+)\s*(.*)$') {
+        $result.FilePath = $matches[1]
+        $result.Arguments = $matches[2].Trim()
+    }
+
+    return $result
+}
+
+function Get-InstalledAppInventory {
+    $inventory = New-Object System.Collections.Generic.List[object]
+    $dedupe = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+
+    $registryRoots = @(
+        @{ Path = 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*'; Scope = 'Machine' },
+        @{ Path = 'HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*'; Scope = 'Machine x86' },
+        @{ Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*'; Scope = 'Current User' }
+    )
+
+    foreach ($root in $registryRoots) {
+        Get-ItemProperty -Path $root.Path -ErrorAction SilentlyContinue |
+            Where-Object {
+                $_.DisplayName -and (-not $_.SystemComponent) -and ($_.UninstallString -or $_.QuietUninstallString)
+            } |
+            ForEach-Object {
+                $displayName = [string]$_.DisplayName
+                $publisher = [string]$_.Publisher
+                $version = [string]$_.DisplayVersion
+                $uninstallCommand = [string]$_.QuietUninstallString
+                if ([string]::IsNullOrWhiteSpace($uninstallCommand)) { $uninstallCommand = [string]$_.UninstallString }
+                $dedupeKey = "{0}|{1}|{2}" -f $displayName, $publisher, $root.Scope
+                if ($dedupe.Add($dedupeKey)) {
+                    $inventory.Add([pscustomobject]@{
+                        DisplayName = $displayName
+                        DisplayText = if ($version) { "$displayName  [$version]  -  $publisher  ($($root.Scope))" } else { "$displayName  -  $publisher  ($($root.Scope))" }
+                        Publisher = $publisher
+                        Version = $version
+                        Scope = $root.Scope
+                        Type = 'Win32'
+                        PackageFullName = $null
+                        UninstallCommand = $uninstallCommand
+                    })
+                }
+            }
+    }
+
+    try {
+        Get-AppxPackage -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -and (-not $_.IsFramework) -and (-not $_.NonRemovable) } |
+            ForEach-Object {
+                $dedupeKey = "Appx|$($_.PackageFullName)"
+                if ($dedupe.Add($dedupeKey)) {
+                    $inventory.Add([pscustomobject]@{
+                        DisplayName = $_.Name
+                        DisplayText = "$($_.Name)  [$($_.Version)]  -  Appx  ($($_.Publisher))"
+                        Publisher = [string]$_.Publisher
+                        Version = [string]$_.Version
+                        Scope = 'Current User'
+                        Type = 'Appx'
+                        PackageFullName = [string]$_.PackageFullName
+                        UninstallCommand = $null
+                    })
+                }
+            }
+    } catch {
+        # Appx enumeration is best-effort; keep Win32 inventory available if it fails.
+    }
+
+    return @($inventory | Sort-Object DisplayName, Type, Scope)
+}
+
+function Update-InstalledAppsStatus {
+    $totalCount = $InstalledAppsList.Items.Count
+    $selectedCount = $InstalledAppsList.SelectedItems.Count
+    $AppsStatusText.Text = "Apps loaded: $totalCount  |  Selected: $selectedCount"
+}
+
+function Load-InstalledApps {
+    $InstalledAppsList.Items.Clear()
+    foreach ($app in @(Get-InstalledAppInventory)) {
+        [void]$InstalledAppsList.Items.Add($app)
+    }
+    Update-InstalledAppsStatus
+}
+
+function Invoke-BulkAppUninstall {
+    param([object[]]$Applications)
+
+    if (-not $Applications -or $Applications.Count -eq 0) {
+        [System.Windows.MessageBox]::Show("Select one or more apps first.","Uninstall Apps",[System.Windows.MessageBoxButton]::OK,[System.Windows.MessageBoxImage]::Information) | Out-Null
+        return
+    }
+
+    $preview = ($Applications | ForEach-Object { $_.DisplayName }) -join [Environment]::NewLine
+    $confirm = [System.Windows.MessageBox]::Show(
+        "Uninstall the selected apps?`n`n$preview",
+        "Bulk App Uninstall",
+        [System.Windows.MessageBoxButton]::YesNo,
+        [System.Windows.MessageBoxImage]::Warning
+    )
+    if ($confirm -ne [System.Windows.MessageBoxResult]::Yes) { return }
+
+    $results = New-Object System.Collections.Generic.List[string]
+    foreach ($app in $Applications) {
+        try {
+            if ($app.Type -eq 'Appx') {
+                Remove-AppxPackage -Package $app.PackageFullName -ErrorAction Stop
+                $results.Add("Removed Appx: $($app.DisplayName)")
+                continue
+            }
+
+            $command = [string]$app.UninstallCommand
+            if ([string]::IsNullOrWhiteSpace($command)) {
+                throw "No uninstall command found."
+            }
+
+            if ($command -match 'msiexec(\.exe)?') {
+                $productCode = $null
+                if ($command -match '\{[0-9A-Fa-f-]{36}\}') { $productCode = $matches[0] }
+                $msiArgs = if ($productCode) { "/x $productCode /qn /norestart" } else { $command -replace '(^|\s)/I', ' /X' }
+                Start-Process -FilePath "msiexec.exe" -ArgumentList $msiArgs -Wait -ErrorAction Stop
+            } else {
+                $parsedCommand = Split-CommandLine -CommandLine $command
+                if ([string]::IsNullOrWhiteSpace($parsedCommand.FilePath)) {
+                    throw "Unable to parse uninstall command."
+                }
+                Start-Process -FilePath $parsedCommand.FilePath -ArgumentList $parsedCommand.Arguments -Wait -ErrorAction Stop
+            }
+
+            $results.Add("Uninstalled: $($app.DisplayName)")
+        } catch {
+            $results.Add("Failed: $($app.DisplayName) ($($_.Exception.Message))")
+        }
+    }
+
+    [System.Windows.MessageBox]::Show(
+        ($results -join [Environment]::NewLine),
+        "Bulk App Uninstall",
+        [System.Windows.MessageBoxButton]::OK,
+        [System.Windows.MessageBoxImage]::Information
+    ) | Out-Null
+    Load-InstalledApps
 }
 
 function Get-NewTweakKeys {
@@ -1166,6 +1365,7 @@ Write-Host "Window will remain open for review." -ForegroundColor Yellow
 }
 
 Load-UserProfiles -TargetList $UserList
+Load-InstalledApps
 Update-SelectionCount
 Set-EnterpriseMode -Enabled ([bool]$EnterpriseModeCB.IsChecked)
 
@@ -1281,6 +1481,25 @@ $CopyRegPathBtn.Add_Click({
 
 $InstallFeaturesBtn.Add_Click({ Install-SelectedFeatures })
 
+$RefreshAppsBtn.Add_Click({ Load-InstalledApps })
+
+$SelectAllAppsBtn.Add_Click({
+    if ($InstalledAppsList.Items.Count -gt 0) {
+        $InstalledAppsList.SelectAll()
+    }
+    Update-InstalledAppsStatus
+})
+
+$ClearAppsBtn.Add_Click({
+    $InstalledAppsList.UnselectAll()
+    Update-InstalledAppsStatus
+})
+
+$UninstallSelectedAppsBtn.Add_Click({
+    $selectedApps = @($InstalledAppsList.SelectedItems)
+    Invoke-BulkAppUninstall -Applications $selectedApps
+})
+
 $ResetNetworkBtn.Add_Click({
     $cmd = @'
 Write-Host "Resetting network stack..." -ForegroundColor Cyan
@@ -1326,6 +1545,8 @@ foreach ($control in $allOptionControls) {
 }
 
 $UserList.Add_SelectionChanged({ Update-SelectionCount })
+
+$InstalledAppsList.Add_SelectionChanged({ Update-InstalledAppsStatus })
 
 $RunBtn.Add_Click({
     $selectedUsers = @($UserList.SelectedItems | ForEach-Object { [string]$_ })
